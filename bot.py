@@ -2,9 +2,8 @@
 from pyrogram import Client, filters
 
 # Твои данные
-API_ID = 28992824  # Замени на свой API ID
-API_HASH = "90d4f1eaa5a901e8cfd5cdb307d1f5a9"  # Замени на свой API Hash
-BOT_TOKEN = "7175805241:AAEQiJ0BEjieDmHr8u45KLM4MPnUJKV8IP0"  # Уже вставил
+BOT_TOKEN = "7381957222:AAGmN1PrepByLYiywBlQfXny1o-CcA95ZB0"
+
 
 # Аккаунт, куда пересылать сообщения
 ADMIN_USERNAME = "@KOSTYANSHK"
